@@ -22,7 +22,7 @@ You should install the bloody thing into a virtualenv:
   easy_install pyramid
   easy_install waitress
 
-  git clone ....
+  git clone https://github.com/petrblahos/tricycles.git
   cd tricycles
   python step01.py
   # or
