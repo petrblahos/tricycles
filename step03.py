@@ -88,7 +88,7 @@ class View(object):
     def login_view(self):
         userid = self.request.params.get("userid")
         response = self.response(["LOGGED IN", userid ])
-        response.set_cookie("userid", self._encode_cookie(userid), http_only=1)    # session - cleared with browser exit
+        response.set_cookie("userid", self._encode_cookie(userid), httponly=1)    # session - cleared with browser exit
         return response
 
     @view_config(route_name="logout", )
