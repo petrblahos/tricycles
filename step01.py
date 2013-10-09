@@ -43,11 +43,11 @@ class View(object):
     def login_view(self):
         userid = self.request.params.get("userid")
         response = self.response(["LOGGED IN", userid ])
-        response.set_cookie("userid", str(userid))
+        response.set_cookie("userid", str(userid), httponly=1)
+        #response.set_cookie("userid", str(userid), )
         #response.set_cookie("userid", str(userid), secure=1)    # secure flag
         #response.set_cookie("userid", str(userid), max_age=600) # 600 seconds - survives browser restart
         return response
-
 
     @view_config(route_name="logout")
     def logout_view(self):
