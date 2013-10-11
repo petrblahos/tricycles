@@ -43,16 +43,12 @@ class View(object):
     SECRET = "verysecretstring"
     USER_SALT = defaultdict(lambda : str(random.randint(1000000, 9999999)))
     def _encode_cookie(self, userid):
-        # the most basic version:
-        #return str(userid)
         ip = ""
         ts = int(time.time())
         digest = calculate_digest(self.SECRET, userid, self.USER_SALT[userid], ts, ip)
         return "%s-%s-%s" % (digest, ts, userid)
 
     def _decode_cookie(self):
-        # the most basic version:
-        #return self.request.cookies.get("userid", None)
         cookie = self.request.cookies.get("userid", None)
         if not cookie:
             return None

@@ -38,16 +38,12 @@ def calculate_digest(secret, userid, timestamp, ip):
 class View(object):
     SECRET = "verysecretstring"
     def _encode_cookie(self, userid):
-        # the most basic version:
-        #return str(userid)
         ip = ""
         ts = int(time.time())
         digest = calculate_digest(self.SECRET, userid, ts, ip)
         return "%s-%s-%s" % (digest, ts, userid)
 
     def _decode_cookie(self):
-        # the most basic version:
-        #return self.request.cookies.get("userid", None)
         cookie = self.request.cookies.get("userid", None)
         if not cookie:
             return None
