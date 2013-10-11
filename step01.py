@@ -53,7 +53,6 @@ class View(object):
     def logout_view(self):
         response = self.response(["LOGGED OUT" ])
         response.delete_cookie("userid")
-        #response.set_cookie("userid", "", max_age=-1)
         return response
 
 if __name__ == '__main__':
