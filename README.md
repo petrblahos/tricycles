@@ -13,14 +13,15 @@ Setup
 -----
 You should install the bloody thing into a virtualenv:
 
-  virtualenv TRICYCLE
+  virtualenv -p python3 TRICYCLE
   cd TRICYCLE
   # in unix:
   . bin/activate.sh
   REM in windows:
   scripts\activate
-  easy_install pyramid
-  easy_install waitress
+  pip install pyramid
+  pip install mako
+  pip install waitress
 
   git clone https://github.com/petrblahos/tricycles.git
   cd tricycles

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import datetime
 import hashlib
 import logging
 import time
@@ -17,8 +16,10 @@ main_template = Template("""<html><head>
 <h1>TRICYCLES</h1>
 <a href="${ request.route_url('root') }">HOME</a><br/>
 <hr/>
-<a href="${ request.route_url('login', _query={'userid': 'john'}) }">Login as john</a><br/>
-<a href="${ request.route_url('login', _query={'userid': 'bob'}) }">Login as bob</a><br/>
+<a href="${ request.route_url('login', _query={'userid': 'john'}) }">
+Login as john</a><br/>
+<a href="${ request.route_url('login', _query={'userid': 'bob'}) }">
+Login as bob</a><br/>
 <hr/>
 <a href="${ request.route_url('logout') }">Logout</a><br/>
 <hr/>
@@ -26,6 +27,7 @@ ${ msg }
 <hr/>
 User ID: ${ identity if not identity is None else "--not-set--" }
 </body></html>""")
+
 
 def calculate_digest(secret, userid, timestamp, ip):
     m = hashlib.sha1()
@@ -35,8 +37,10 @@ def calculate_digest(secret, userid, timestamp, ip):
     m.update(str(ip).encode("utf8"))
     return m.hexdigest()
 
+
 class View(object):
     SECRET = "verysecretstring"
+
     def _encode_cookie(self, userid):
         ip = ""
         ts = int(time.time())
@@ -58,7 +62,7 @@ class View(object):
             raise response
         ip = ""
         d2 = calculate_digest(self.SECRET, userid, ts, ip)
-        if d2==digest:
+        if d2 == digest:
             return userid
         logging.error("bad digest")
         response = HTTPBadRequest()
@@ -71,10 +75,10 @@ class View(object):
 
     def response(self, msg):
         return Response(main_template.render(
-                request=self.request,
-                msg=msg,
-                identity=self.identity
-            ))
+            request=self.request,
+            msg=msg,
+            identity=self.identity
+        ))
 
     @view_config(route_name="root", )
     def root_view(self):
@@ -83,13 +87,14 @@ class View(object):
     @view_config(route_name="login", )
     def login_view(self):
         userid = self.request.params.get("userid")
-        response = self.response(["LOGGED IN", userid ])
-        response.set_cookie("userid", self._encode_cookie(userid), httponly=1)    # session - cleared with browser exit
+        response = self.response(["LOGGED IN", userid])
+        # session - cleared with browser exit:
+        response.set_cookie("userid", self._encode_cookie(userid), httponly=1)
         return response
 
     @view_config(route_name="logout", )
     def logout_view(self):
-        response = self.response(["LOGGED OUT" ])
+        response = self.response(["LOGGED OUT"])
         response.delete_cookie("userid")
         return response
 
@@ -101,4 +106,3 @@ if __name__ == '__main__':
     config.scan()
     app = config.make_wsgi_app()
     serve(app)
-

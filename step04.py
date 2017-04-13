@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from collections import defaultdict
-import datetime
 import hashlib
 import logging
 import random
@@ -19,8 +18,10 @@ main_template = Template("""<html><head>
 <h1>TRICYCLES</h1>
 <a href="${ request.route_url('root') }">HOME</a><br/>
 <hr/>
-<a href="${ request.route_url('login', _query={'userid': 'john'}) }">Login as john</a><br/>
-<a href="${ request.route_url('login', _query={'userid': 'bob'}) }">Login as bob</a><br/>
+<a href="${ request.route_url('login', _query={'userid': 'john'}) }">
+Login as john</a><br/>
+<a href="${ request.route_url('login', _query={'userid': 'bob'}) }">
+Login as bob</a><br/>
 <hr/>
 <a href="${ request.route_url('passwd') }">Change Password</a><br/>
 <a href="${ request.route_url('logout') }">Logout</a><br/>
@@ -29,6 +30,7 @@ ${ msg }
 <hr/>
 User ID: ${ identity if not identity is None else "--not-set--" }
 </body></html>""")
+
 
 def calculate_digest(secret, userid, usersalt, timestamp, ip):
     m = hashlib.sha1()
@@ -39,13 +41,16 @@ def calculate_digest(secret, userid, usersalt, timestamp, ip):
     m.update(str(ip).encode("utf8"))
     return m.hexdigest()
 
+
 class View(object):
     SECRET = "verysecretstring"
-    USER_SALT = defaultdict(lambda : str(random.randint(1000000, 9999999)))
+    USER_SALT = defaultdict(lambda: str(random.randint(1000000, 9999999)))
+
     def _encode_cookie(self, userid):
         ip = ""
         ts = int(time.time())
-        digest = calculate_digest(self.SECRET, userid, self.USER_SALT[userid], ts, ip)
+        digest = calculate_digest(self.SECRET, userid,
+                                  self.USER_SALT[userid], ts, ip)
         return "%s-%s-%s" % (digest, ts, userid)
 
     def _decode_cookie(self):
@@ -62,8 +67,9 @@ class View(object):
             response.delete_cookie("userid")
             raise response
         ip = ""
-        d2 = calculate_digest(self.SECRET, userid, self.USER_SALT[userid], ts, ip)
-        if d2==digest:
+        d2 = calculate_digest(self.SECRET, userid, self.USER_SALT[userid],
+                              ts, ip)
+        if d2 == digest:
             return userid
         logging.error("bad digest")
         response = HTTPBadRequest()
@@ -76,10 +82,10 @@ class View(object):
 
     def response(self, msg):
         return Response(main_template.render(
-                request=self.request,
-                msg=msg,
-                identity=self.identity
-            ))
+            request=self.request,
+            msg=msg,
+            identity=self.identity
+        ))
 
     @view_config(route_name="root", )
     def root_view(self):
@@ -88,13 +94,14 @@ class View(object):
     @view_config(route_name="login", )
     def login_view(self):
         userid = self.request.params.get("userid")
-        response = self.response(["LOGGED IN", userid ])
-        response.set_cookie("userid", self._encode_cookie(userid), httponly=1)    # session - cleared with browser exit
+        response = self.response(["LOGGED IN", userid])
+        # session - cleared with browser exit:
+        response.set_cookie("userid", self._encode_cookie(userid), httponly=1)
         return response
 
     @view_config(route_name="logout", )
     def logout_view(self):
-        response = self.response(["LOGGED OUT" ])
+        response = self.response(["LOGGED OUT"])
         response.delete_cookie("userid")
         return response
 
@@ -104,9 +111,12 @@ class View(object):
         # and "store it into the database with the password".
         del self.USER_SALT[self.identity]
         # Then we re-generate the cookie, otherwise we will be logged out.
-        response = self.response(["PASSWORD CHANGED", self.identity ])
-        response.set_cookie("userid", self._encode_cookie(self.identity), httponly=1)    # session - cleared with browser exit
+        response = self.response(["PASSWORD CHANGED", self.identity])
+        # session - cleared with browser exit:
+        response.set_cookie("userid", self._encode_cookie(self.identity),
+                            httponly=1)
         return response
+
 
 if __name__ == '__main__':
     config = Configurator()
@@ -117,4 +127,3 @@ if __name__ == '__main__':
     config.scan()
     app = config.make_wsgi_app()
     serve(app)
-
