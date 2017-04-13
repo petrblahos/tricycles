@@ -32,11 +32,11 @@ User ID: ${ identity if not identity is None else "--not-set--" }
 
 def calculate_digest(secret, userid, usersalt, timestamp, ip):
     m = hashlib.sha1()
-    m.update(str(secret))
-    m.update(str(userid))
-    m.update(str(usersalt))
-    m.update(str(timestamp))
-    m.update(str(ip))
+    m.update(str(secret).encode("utf8"))
+    m.update(str(userid).encode("utf8"))
+    m.update(str(usersalt).encode("utf8"))
+    m.update(str(timestamp).encode("utf8"))
+    m.update(str(ip).encode("utf8"))
     return m.hexdigest()
 
 class View(object):
